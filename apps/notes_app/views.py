@@ -1,12 +1,7 @@
-# содержит представления для обработкизапросов API
-
-from functools import partial
-from rest_framework import generics,status
+from rest_framework import generics, status
 from rest_framework.response import Response 
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
 from .models import Note
-from .serializers import NoteCreateSerializer,NoteUpdateSerializer, NoteSerializer
+from .serializers import NoteCreateSerializer, NoteUpdateSerializer, NoteSerializer
 
 
 class NoteListCreateView(generics.ListCreateAPIView):
@@ -14,10 +9,10 @@ class NoteListCreateView(generics.ListCreateAPIView):
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
-            return NoteCreateSerializer()
-        return NoteSerializer()
+            return NoteCreateSerializer 
+        return NoteSerializer  
 
-    def get(self,request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         # обрабатывает get запрос для получения списка заметок
         return super().get(request, *args, **kwargs)
     
@@ -26,15 +21,15 @@ class NoteDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Note.objects.all()
 
     def get_serializer_class(self):
-        if self.request.method in ['PUT','PATCH']:
-            return NoteUpdateSerializer()
-        return NoteSerializer()
+        if self.request.method in ['PUT', 'PATCH']:
+            return NoteUpdateSerializer  
+        return NoteSerializer  
     
-    def update(self,request, *args, **kwargs):
+    def update(self, request, *args, **kwargs):
         # обработка обновления заметки 
-        partial = kwargs.pop('partial',False)
+        partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        serializer = self.get_serializer(instance,data=request.data, partial=partial)
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
 
         if serializer.is_valid():
             self.perform_update(serializer)
@@ -45,5 +40,7 @@ class NoteDetailView(generics.RetrieveUpdateDestroyAPIView):
         # метод удаления заметки
         instance = self.get_object()
         self.perform_destroy(instance)
-        return Response({'message':'Заметка успешно удалена'},
-                        status=status.HTTP_204_NO_CONTENT,)
+        return Response(
+            {'message': 'Заметка успешно удалена'},
+            status=status.HTTP_204_NO_CONTENT,
+        )
